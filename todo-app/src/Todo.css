@@ -1,0 +1,44 @@
+.todo-wrapper {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.todo-wrapper__head {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 100px;
+    gap: 10px;
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #222;
+}
+
+.todo-wrapper__body {
+    border: 1px solid #222;
+    padding: 20px;
+    width: 100%;
+}
+
+.todo {
+    border: 1px solid #222;
+    padding: 10px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.todo .button--success {
+    background-color: #5cb85c;
+}
+
+.todo .button--danger {
+    background-color: #d9534f;
+}
