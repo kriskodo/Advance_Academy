@@ -8,10 +8,11 @@ const apiMovies = {
     description,
     posterUrl,
   }),
-  editMovie: (movieId, title, description, posterUrl) => makeRequest(`/api/v1/movies/${movieId}`, 'PUT', {
+  editMovie: (movieId, title, description, posterUrl, youtubeId) => makeRequest(`/api/v1/movies/${movieId}`, 'PUT', {
     title,
     description,
     posterUrl,
+    youtubeId,
   }),
   deleteMovie: (movieId) => makeRequest(`/api/v1/movies/${movieId}`, 'DELETE'),
   rateMovie: (movieId, rating) => makeRequest(`/api/v1/movies/${movieId}/rate`, 'POST', { rating }),

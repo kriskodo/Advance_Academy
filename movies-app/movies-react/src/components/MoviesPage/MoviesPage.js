@@ -9,6 +9,8 @@ function MoviesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const fetchData = async () => {
       const response = await apiMovies.getAll();
       if (isLoading) {
@@ -31,7 +33,7 @@ function MoviesPage() {
 
   return (
     <>
-      <MDBInput type="text" value={search} onChange={handleSearch} placeholder="Search for a movie" />
+      <MDBInput type="text" value={search} onChange={handleSearch} label="Search for a movie" />
 
       <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
         {isLoading

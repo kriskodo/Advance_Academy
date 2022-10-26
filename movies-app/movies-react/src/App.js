@@ -11,9 +11,10 @@ function App() {
       <Navigation />
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/movies/:id" element={<MoviePage />} />
+        <Route exact path="/" element={<Home />} />
+        <Route exact path="/movies" element={<Movies />} />
+        <Route exact path="/movies/:id" element={<MoviePage />} />
+        <Route path="*" element={<p>Error 404 Not found.</p>} />
       </Routes>
     </div>
   );

@@ -7,7 +7,7 @@ import {
 } from 'mdb-react-ui-kit';
 import './Navigation.css';
 
-function Navigation(props) {
+function Navigation() {
   return (
     <header>
       <MDBNavbar expand="lg" light bgColor="light">

@@ -1,29 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  MDBBtn, MDBBtnGroup, MDBInput, MDBTextArea,
+  MDBBtn,
+  MDBBtnGroup,
+  MDBCard, MDBCardBody,
+  MDBCardHeader,
+  MDBCardImage,
+  MDBCol,
+  MDBInput,
+  MDBRow,
+  MDBTextArea,
 } from 'mdb-react-ui-kit';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
+import './MoviePage.css';
+import apiMovies from '../../api/movies';
 
 function MoviePage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const {
-    id, description, comments, posterUrl, rating, title, youtubeId,
-  } = location.state;
+  const { id } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedValues, setEditedValues] = useState({
-    id,
-    description,
-    title,
-    rating,
-    youtubeId,
-    comments,
-    posterUrl,
-  });
+  const [editableValues, setEditableValues] = useState(null);
+  const [originalValues, setOriginalValues] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    apiMovies.getById(id)
+      .then((data) => {
+        setEditableValues({ ...data });
+        setOriginalValues({ ...data });
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate('/404');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+
+    return () => {
+      setIsLoading(false);
+    };
+  }, [id, navigate]);
 
   const handleChange = (e) => {
-    setEditedValues((prev) => (
+    setEditableValues((prev) => (
       {
         ...prev,
         [e.target.name]: [e.target.value],
@@ -32,92 +54,131 @@ function MoviePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(editedValues);
+    const {
+      title, description, posterUrl, youtubeId,
+    } = editableValues;
+    setIsLoading(true);
+
+    apiMovies.editMovie(id, typeof title === 'object' ? title[0] : title, description, posterUrl, youtubeId)
+      .then(() => {
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
+  const handleDiscard = (e) => {
+    e.preventDefault();
+    setEditableValues(originalValues);
+    setIsEditing(false);
+  }
+
   return (
-    <div className="movie">
-      {isEditing ? (
-        <>
-          <div>
-            Edit
-            {title}
-          </div>
-          <form onSubmit={handleSubmit}>
-            {Object.keys(editedValues).filter((x) => x !== 'id').map((key) => (
-              <div key={key}>
-                <label
-                  htmlFor={`${id}_${description}`}
-                  className="form-label"
-                >
-                  {key}
-                </label>
+    <MDBRow className="d-flex justify-content-center">
+      {editableValues && !isLoading ? (
+        <MDBCol sm="6" className="p-5">
+          <MDBCard sm="6" className="p-5">
+            {isEditing ? (
+              <>
+                <MDBCardHeader>
+                  Edit
+                  {' '}
+                  {originalValues.title}
+                </MDBCardHeader>
+                <form onSubmit={handleSubmit}>
+                  {Object.keys(editableValues).filter((x) => x !== 'id' && x !== 'rating').map((key) => (
+                    <div key={key}>
+                      <label
+                        htmlFor={`${editableValues.id}_${editableValues.description}`}
+                        className="form-label"
+                      >
+                        {key}
+                      </label>
 
-                {key === 'description' && (
-                <MDBTextArea
-                  id={`${id}_${description}`}
-                  rows={10}
-                  cols={50}
-                  type="text"
-                  value={editedValues[key]}
-                  onChange={handleChange}
-                  name={key}
-                />
-                )}
+                      {key === 'description' && (
+                      <MDBTextArea
+                        id={`${editableValues.id}_${editableValues.description}`}
+                        rows={10}
+                        cols={50}
+                        type="text"
+                        value={editableValues[key]}
+                        onChange={handleChange}
+                        name={key}
+                      />
+                      )}
 
-                {key !== 'description' && (
-                <MDBInput
-                  id={`${id}_${description}`}
-                  rows={10}
-                  cols={50}
-                  type="text"
-                  value={editedValues[key]}
-                  onChange={handleChange}
-                  name={key}
+                      {key !== 'description' && (
+                      <MDBInput
+                        id={`${editableValues.id}_${editableValues.description}`}
+                        rows={10}
+                        cols={50}
+                        type="text"
+                        value={editableValues[key]}
+                        onChange={handleChange}
+                        name={key}
+                      />
+                      )}
+                    </div>
+                  ))}
+                  <MDBBtnGroup>
+                    <MDBBtn type="submit">Save</MDBBtn>
+                    <MDBBtn
+                      type="button"
+                      onClick={handleDiscard}
+                    >
+                      Discard
+                    </MDBBtn>
+                  </MDBBtnGroup>
+                </form>
+              </>
+            ) : (
+              <>
+                <MDBCardImage
+                  src={editableValues?.posterUrl}
+                  className="card-img-top card-img-top--fit"
+                  alt="poster"
                 />
-                )}
-              </div>
-            ))}
-            <MDBBtnGroup>
-              <MDBBtn type="submit">Save</MDBBtn>
-              <MDBBtn
-                type="button"
-                onClick={() => setIsEditing(false)}
-              >
-                Discard
-              </MDBBtn>
-            </MDBBtnGroup>
-          </form>
-        </>
+                <br />
+
+                <h5>{editableValues.title}</h5>
+                <hr />
+
+                <h5>Description</h5>
+                <p>{editableValues.description}</p>
+                <hr />
+
+                <h5>Rating</h5>
+                <p>{editableValues.rating}</p>
+                <hr />
+
+                <MDBBtnGroup>
+                  <MDBBtn onClick={() => setIsEditing(true)}>Edit</MDBBtn>
+                  <MDBBtn onClick={() => navigate('/movies')}>Back</MDBBtn>
+                </MDBBtnGroup>
+                <MDBCard style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <MDBCardHeader>Trailer: </MDBCardHeader>
+                  <MDBCardBody>
+                    <iframe
+                      title={editableValues.title}
+                      width="420"
+                      height="315"
+                      src={`https://www.youtube.com/embed/${editableValues.youtubeId}`}
+                    />
+                  </MDBCardBody>
+                </MDBCard>
+              </>
+            )}
+          </MDBCard>
+        </MDBCol>
       ) : (
-        <>
-          <img
-            src={posterUrl}
-            style={{ maxWidth: '500px', maxHeight: '500px' }}
-            alt="poster"
-          />
-          <h2>{title}</h2>
-
-          <p>{description}</p>
-
-          <p>{rating}</p>
-
-          <MDBBtnGroup>
-            <MDBBtn onClick={() => setIsEditing(true)}>Edit</MDBBtn>
-            <MDBBtn onClick={() => navigate('/movies')}>Back</MDBBtn>
-          </MDBBtnGroup>
-        </>
+        <div>Loading...</div>
       )}
-
-    </div>
+    </MDBRow>
   );
-}
-
-{ /* <iframe width="420" height="315" */
-}
-{ /*        src={`https://www.youtube.com/embed/${youtubeId}`}> */
-}
-{ /* </iframe> */
 }
 
 export default MoviePage;
