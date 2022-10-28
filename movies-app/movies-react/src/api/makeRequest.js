@@ -1,4 +1,4 @@
-const makeRequest = async (url, method, body) => await fetch(url, {
+const makeRequest = async (url, method, body) => fetch(url, {
   method,
   body: JSON.stringify(body),
   headers: {

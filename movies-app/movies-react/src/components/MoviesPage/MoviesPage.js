@@ -2,10 +2,12 @@ import React, { memo, useEffect, useState } from 'react';
 import { MDBInput } from 'mdb-react-ui-kit';
 import Movie from '../Movie/Movie';
 import apiMovies from '../../api/movies';
+import useDebounce from '../../hooks/useDebounce';
 
 function MoviesPage() {
   const [movies, setMovies] = useState([]);
   const [search, setSearch] = useState('');
+  const debounceSearchTerm = useDebounce(search, 500);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,11 +40,14 @@ function MoviesPage() {
       <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
         {isLoading
           ? <div>Loading</div>
-          : movies.filter((x) => x.title.toLowerCase().includes(search)).map((movie) => (
-            <div key={movie.id}>
-              <Movie {...movie} />
-            </div>
-          ))}
+          : movies.filter((x) => x.title
+            .toLowerCase()
+            .includes(debounceSearchTerm))
+            .map((movie) => (
+              <div key={movie.id}>
+                <Movie {...movie} />
+              </div>
+            ))}
       </div>
 
     </>
