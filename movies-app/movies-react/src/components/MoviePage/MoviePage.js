@@ -10,8 +10,16 @@ import {
   MDBRow,
   MDBTextArea,
 } from 'mdb-react-ui-kit';
+
 import { useNavigate, useParams } from 'react-router';
 import './MoviePage.css';
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  Rating,
+} from '@mui/material';
 import apiMovies from '../../api/movies';
 
 function MoviePage() {
@@ -22,6 +30,9 @@ function MoviePage() {
   const [editableValues, setEditableValues] = useState(null);
   const [originalValues, setOriginalValues] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [isRatingDisabled, setIsRatingDisabled] = useState(false);
+  const [commentsDrawerOpened, setCommentsDrawerOpened] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -30,6 +41,7 @@ function MoviePage() {
       .then((data) => {
         setEditableValues({ ...data });
         setOriginalValues({ ...data });
+        setRating(data.rating)
       })
       .catch((err) => {
         console.log(err);
@@ -75,6 +87,17 @@ function MoviePage() {
     e.preventDefault();
     setEditableValues(originalValues);
     setIsEditing(false);
+  }
+
+  const onRatingChange = (e, chosenRating) => {
+    apiMovies.rateMovie(id, chosenRating).then((ratingAfterUpdate) => {
+      setIsRatingDisabled(true);
+      setRating(ratingAfterUpdate);
+    });
+  }
+
+  const toggleDrawer = (flag) => {
+    setCommentsDrawerOpened(flag);
   }
 
   return (
@@ -152,15 +175,25 @@ function MoviePage() {
                 <hr />
 
                 <h5>Rating</h5>
-                <p>{editableValues.rating}</p>
+                <Rating
+                  name="half-rating"
+                  value={rating}
+                  onChange={onRatingChange}
+                  disabled={isRatingDisabled}
+                />
                 <hr />
 
                 <MDBBtnGroup>
                   <MDBBtn onClick={() => setIsEditing(true)}>Edit</MDBBtn>
                   <MDBBtn onClick={() => navigate('/movies')}>Back</MDBBtn>
                 </MDBBtnGroup>
+                <hr />
                 <MDBCard style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <MDBCardHeader>Trailer: </MDBCardHeader>
+                  <MDBCardHeader>
+                    <h5>
+                      Trailer:
+                    </h5>
+                  </MDBCardHeader>
                   <MDBCardBody>
                     <iframe
                       title={editableValues.title}
@@ -170,6 +203,24 @@ function MoviePage() {
                     />
                   </MDBCardBody>
                 </MDBCard>
+
+                <React.Fragment key="left-drawer">
+                  <Button onClick={() => toggleDrawer(true)}>See Comments</Button>
+                  <Drawer
+                    anchor="right"
+                    open={commentsDrawerOpened}
+                    onClose={() => toggleDrawer(false)}
+                  >
+                    <Box
+                      sx={{ width: 750 }}
+                      role="presentation"
+                    >
+                      comments
+                      <Divider />
+                      comment now
+                    </Box>
+                  </Drawer>
+                </React.Fragment>
               </>
             )}
           </MDBCard>

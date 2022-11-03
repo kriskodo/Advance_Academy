@@ -21,10 +21,6 @@ function MoviesPage() {
     setIsLoading(false);
 
     fetchData();
-
-    return () => {
-      setIsLoading(false);
-    }
   }, [isLoading]);
 
   const handleSearch = (e) => {

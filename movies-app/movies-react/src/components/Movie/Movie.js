@@ -23,11 +23,15 @@ function Movie({
 
       <p>{description}</p>
 
-      <p>{rating}</p>
+      <p>
+        Rating:
+        {+rating.toFixed(2)}
+        /5
+      </p>
 
       <MDBBtnGroup>
         <MDBBtn onClick={() => navigate(`./${id}`)}>
-          Edit
+          View
         </MDBBtn>
       </MDBBtnGroup>
     </div>
