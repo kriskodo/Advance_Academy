@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import './Navigation.css';
 
 function Navigation() {
-  const pages = ['Home', 'Movies'];
+  const pages = [{ Home: '/' }, { Movies: '/movies' }, { 'Create a Movie': '/movies/create' }];
   const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -58,7 +58,7 @@ function Navigation() {
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              Movies
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -90,11 +90,15 @@ function Navigation() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Link to={`${page === 'Home' ? '/' : page}`}>{page}</Link>
-                  </MenuItem>
-                ))}
+                {pages.map((page) => {
+                  const [label, link] = Object.entries(page)[0];
+
+                  return (
+                    <MenuItem key={label} onClick={handleCloseNavMenu}>
+                      <Link to={link}>{label}</Link>
+                    </MenuItem>
+                  )
+                })}
               </Menu>
             </Box>
             <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -117,20 +121,23 @@ function Navigation() {
               LOGO
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  <Link
-                    to={`${page === 'Home' ? '/' : page.toLowerCase()}`}
-                    style={{ color: '#fff' }}
+              {pages.map((page) => {
+                const [label, link] = Object.entries(page)[0];
+                return (
+                  <Button
+                    key={label}
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: 'white', display: 'block' }}
                   >
-                    {page}
-                  </Link>
-                </Button>
-              ))}
+                    <Link
+                      to={link}
+                      style={{ color: '#fff' }}
+                    >
+                      {label}
+                    </Link>
+                  </Button>
+                )
+              })}
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>

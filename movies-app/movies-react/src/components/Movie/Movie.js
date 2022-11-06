@@ -16,12 +16,18 @@ function Movie({
     <div className="movie">
       <img
         src={posterUrl}
-        style={{ maxWidth: '500px', maxHeight: '500px' }}
+        style={{ width: '250px', height: '250px', objectFit: 'contain' }}
         alt="poster"
       />
-      <h2>{title}</h2>
+      <h4>
+        {title.substring(0, 25)}
+        {title.length > 25 ? '...' : ''}
+      </h4>
 
-      <p>{description}</p>
+      <p>
+        {description.substring(0, 50)}
+        {description.length > 50 ? '...' : ''}
+      </p>
 
       <p>
         Rating:

@@ -19,7 +19,7 @@ function MovieComments({ comments, onCommentSubmit }) {
       {comments.map(({
         author, content, id, date,
       }) => (
-        <div id={id}>
+        <div key={id}>
           <h6>{author}</h6>
           <p>{content}</p>
           <small>{date}</small>

@@ -1,7 +1,10 @@
 import React, { memo, useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
-import Movie from '../Movie/Movie';
-import apiMovies from '../../api/movies';
+import { Grid, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Movie from '@Components/Movie/Movie';
+import apiMovies from '@Api/movies';
 
 function MoviesPage() {
   const [movies, setMovies] = useState([]);
@@ -27,24 +30,35 @@ function MoviesPage() {
     setSearch(e.target.value);
   }
 
+  const correspondingMovies = movies
+    .filter((x) => x.title
+      .toLowerCase()
+      .includes(search));
+
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  }));
+
   return (
-    <>
+    <Container maxWidth="md">
       <TextField id="standard-basic" value={search} onChange={handleSearch} label="Search for a movie" variant="standard" />
 
-      <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
+      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} margin="0 auto">
         {isLoading
           ? <div>Loading</div>
-          : movies.filter((x) => x.title
-            .toLowerCase()
-            .includes(search))
-            .map((movie) => (
-              <div key={movie.id}>
+          : correspondingMovies.map((movie) => (
+            <Grid xs={6} key={movie.id}>
+              <Item>
                 <Movie {...movie} />
-              </div>
-            ))}
-      </div>
-
-    </>
+              </Item>
+            </Grid>
+          ))}
+      </Grid>
+    </Container>
   );
 }
 

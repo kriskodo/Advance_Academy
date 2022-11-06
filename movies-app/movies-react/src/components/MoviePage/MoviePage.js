@@ -9,7 +9,10 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  Drawer, FormControl, Modal,
+  Dialog,
+  DialogTitle,
+  Drawer,
+  FormControl,
   Rating,
   TextareaAutosize,
   TextField,
@@ -18,16 +21,16 @@ import { styled } from '@mui/material/styles';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Typography from '@mui/material/Typography';
-import apiMovies from '../../api/movies';
-import MovieComments from '../MovieComments/MovieComments';
+import apiMovies from '@Api/movies';
+import MovieComments from '@Components/MovieComments/MovieComments';
 
 function MoviePage() {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editableValues, setEditableValues] = useState([]);
-  const [originalValues, setOriginalValues] = useState([]);
+  const [editableValues, setEditableValues] = useState({});
+  const [originalValues, setOriginalValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [isRatingDisabled, setIsRatingDisabled] = useState(false);
@@ -65,7 +68,7 @@ function MoviePage() {
       }));
   };
 
-  const handleSubmit = (e) => {
+  const handleEditSubmit = (e) => {
     e.preventDefault();
     const {
       title, description, posterUrl, youtubeId,
@@ -75,6 +78,7 @@ function MoviePage() {
     apiMovies.editMovie(id, typeof title === 'object' ? title[0] : title, description, posterUrl, youtubeId)
       .then(() => {
         setIsEditing(false);
+        setOriginalValues(() => ({ ...editableValues }))
       })
       .catch((err) => {
         console.log(err);
@@ -95,10 +99,6 @@ function MoviePage() {
       setIsRatingDisabled(true);
       setRating(ratingAfterUpdate);
     });
-  }
-
-  const toggleDrawer = (flag) => {
-    setCommentsDrawerOpened(flag);
   }
 
   const onCommentSubmit = (value) => {
@@ -122,9 +122,26 @@ function MoviePage() {
     },
   });
 
+  const {
+    title,
+    description,
+    posterUrl,
+    rating: movieRating,
+    comments,
+    youtubeId,
+  } = editableValues;
+
+  const onMovieDelete = (movieId) => {
+    apiMovies.deleteMovie(movieId)
+      .finally((res) => {
+        console.log(res);
+        navigate('/movies');
+      })
+  }
+
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined">
+      <Card variant="outlined" ima>
         <CardContent>
           {isLoading && (
             <div>Loading...</div>
@@ -134,7 +151,7 @@ function MoviePage() {
             <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <CardMedia
                 component="img"
-                image={editableValues?.posterUrl}
+                image={posterUrl ?? ''}
                 style={{
                   maxHeight: '200px',
                   maxWidth: '200px',
@@ -150,34 +167,56 @@ function MoviePage() {
               onMouseEnter={() => setShowDelete(true)}
               onMouseLeave={() => setShowDelete(false)}
             >
-              {editableValues.title}
+              {title}
               {showDelete && (
               <span style={{ position: 'absolute' }}>
-                <Button variant="outlined" color="error">Delete</Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  Delete
+                </Button>
               </span>
               )}
             </h2>
-            <Modal
+
+            <Dialog
               open={showDeleteModal}
               onClose={() => setShowDeleteModal(false)}
               aria-labelledby="parent-modal-title"
               aria-describedby="parent-modal-description"
             >
-              <Box>
-                Modal content
+              <Box flex alignItems="center" justifyContent="center">
+                <DialogTitle>
+                  Are you sure you want to delete
+                  {' '}
+                  {title}
+                  ?
+                </DialogTitle>
+
+                <ButtonGroup
+                  disableElevation
+                  variant="contained"
+                  aria-label="Disabled elevation buttons"
+                  fullWidth
+                >
+                  <Button onClick={() => onMovieDelete(id)}>Delete</Button>
+                  <Button color="error" onClick={() => setShowDeleteModal(false)}>Back</Button>
+                </ButtonGroup>
               </Box>
-            </Modal>
+            </Dialog>
             <hr />
 
             <h5>Description</h5>
-            <p>{editableValues.description}</p>
+            <p>{description}</p>
             <hr />
 
             <h5>Rating</h5>
 
             <StyledRating
               name="customized-color"
-              defaultValue={rating}
+              defaultValue={movieRating}
               value={rating}
               onChange={onRatingChange}
               disabled={isRatingDisabled}
@@ -187,18 +226,18 @@ function MoviePage() {
             />
             <hr />
             <React.Fragment key="left-drawer">
-              <Button onClick={() => toggleDrawer(true)}>See Comments</Button>
+              <Button onClick={() => setCommentsDrawerOpened(true)}>See Comments</Button>
               <Drawer
                 anchor="right"
                 open={commentsDrawerOpened}
-                onClose={() => toggleDrawer(false)}
+                onClose={() => setCommentsDrawerOpened(false)}
               >
                 <Box
                   sx={{ width: 750 }}
                   role="presentation"
                 >
                   <MovieComments
-                    comments={editableValues.comments}
+                    comments={comments}
                     onCommentSubmit={(value) => onCommentSubmit(value)}
                   />
                 </Box>
@@ -224,10 +263,10 @@ function MoviePage() {
               </CardHeader>
               <CardContent>
                 <iframe
-                  title={editableValues.title}
+                  title={title}
                   width="420"
                   height="315"
-                  src={`https://www.youtube.com/embed/${editableValues.youtubeId}`}
+                  src={`https://www.youtube.com/embed/${youtubeId}`}
                 />
               </CardContent>
             </Card>
@@ -240,13 +279,13 @@ function MoviePage() {
                 {' '}
                 {originalValues.title}
               </Typography>
-              <form onSubmit={handleSubmit} style={{ width: '500px', margin: 'auto' }}>
+              <form onSubmit={handleEditSubmit} style={{ width: '500px', margin: 'auto' }}>
                 {Object.keys(editableValues).filter((x) => x !== 'id' && x !== 'rating' && x !== 'comments').map((key) => (
                   <div key={key}>
                     {key === 'description' && (
                     <FormControl fullWidth margin="dense">
                       <TextareaAutosize
-                        id={`${editableValues.id}`}
+                        id={`${id}`}
                         rows={10}
                         cols={50}
                         type="text"
