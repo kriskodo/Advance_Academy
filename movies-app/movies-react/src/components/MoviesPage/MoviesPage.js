@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from 'react';
-import { MDBInput } from 'mdb-react-ui-kit';
+import TextField from '@mui/material/TextField';
 import Movie from '../Movie/Movie';
 import apiMovies from '../../api/movies';
 
@@ -29,7 +29,7 @@ function MoviesPage() {
 
   return (
     <>
-      <MDBInput type="text" value={search} onChange={handleSearch} label="Search for a movie" />
+      <TextField id="standard-basic" value={search} onChange={handleSearch} label="Search for a movie" variant="standard" />
 
       <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
         {isLoading

@@ -1,7 +1,7 @@
 import React from 'react';
 import './Movie.css';
-import { MDBBtn, MDBBtnGroup } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router';
+import { Button, ButtonGroup } from '@mui/material';
 
 function Movie({
   id,
@@ -29,11 +29,13 @@ function Movie({
         /5
       </p>
 
-      <MDBBtnGroup>
-        <MDBBtn onClick={() => navigate(`./${id}`)}>
-          View
-        </MDBBtn>
-      </MDBBtnGroup>
+      <ButtonGroup
+        disableElevation
+        variant="contained"
+        aria-label="Disabled elevation buttons"
+      >
+        <Button onClick={() => navigate(`./${id}`)}>View</Button>
+      </ButtonGroup>
     </div>
   );
 }

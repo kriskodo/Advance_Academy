@@ -1,38 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import {
-  MDBBtn,
-  MDBBtnGroup,
-  MDBCard, MDBCardBody,
-  MDBCardHeader,
-  MDBCardImage,
-  MDBCol,
-  MDBInput,
-  MDBRow,
-  MDBTextArea,
-} from 'mdb-react-ui-kit';
-
 import { useNavigate, useParams } from 'react-router';
 import './MoviePage.css';
 import {
   Box,
   Button,
-  Divider,
-  Drawer,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Drawer, FormControl, Modal,
   Rating,
+  TextareaAutosize,
+  TextField,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import Typography from '@mui/material/Typography';
 import apiMovies from '../../api/movies';
+import MovieComments from '../MovieComments/MovieComments';
 
 function MoviePage() {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editableValues, setEditableValues] = useState(null);
-  const [originalValues, setOriginalValues] = useState(null);
+  const [editableValues, setEditableValues] = useState([]);
+  const [originalValues, setOriginalValues] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [isRatingDisabled, setIsRatingDisabled] = useState(false);
   const [commentsDrawerOpened, setCommentsDrawerOpened] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -100,135 +101,192 @@ function MoviePage() {
     setCommentsDrawerOpened(flag);
   }
 
+  const onCommentSubmit = (value) => {
+    apiMovies.commentMovie(id, 'Static Username', value)
+      .then((newComment) => {
+        setEditableValues((prevValues) => {
+          const copy = { ...prevValues };
+          copy.comments = [...copy.comments, newComment];
+          return copy;
+        })
+      })
+      .catch((err) => console.log(err));
+  }
+
+  const StyledRating = styled(Rating)({
+    '& .MuiRating-iconFilled': {
+      color: '#ff6d75',
+    },
+    '& .MuiRating-iconHover': {
+      color: '#ff3d47',
+    },
+  });
+
   return (
-    <MDBRow className="d-flex justify-content-center">
-      {editableValues && !isLoading ? (
-        <MDBCol sm="6" className="p-5">
-          <MDBCard sm="6" className="p-5">
-            {isEditing ? (
-              <>
-                <MDBCardHeader>
-                  Edit
-                  {' '}
-                  {originalValues.title}
-                </MDBCardHeader>
-                <form onSubmit={handleSubmit}>
-                  {Object.keys(editableValues).filter((x) => x !== 'id' && x !== 'rating').map((key) => (
-                    <div key={key}>
-                      <label
-                        htmlFor={`${editableValues.id}_${editableValues.description}`}
-                        className="form-label"
-                      >
-                        {key}
-                      </label>
+    <Box sx={{ width: '100%' }}>
+      <Card variant="outlined">
+        <CardContent>
+          {isLoading && (
+            <div>Loading...</div>
+          )}
+          {editableValues && !isLoading && !isEditing && (
+          <>
+            <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <CardMedia
+                component="img"
+                image={editableValues?.posterUrl}
+                style={{
+                  maxHeight: '200px',
+                  maxWidth: '200px',
+                  objectFit: 'contain',
+                }}
+                alt="card-image"
+              />
+            </Box>
 
-                      {key === 'description' && (
-                      <MDBTextArea
-                        id={`${editableValues.id}_${editableValues.description}`}
+            <br />
+
+            <h2
+              onMouseEnter={() => setShowDelete(true)}
+              onMouseLeave={() => setShowDelete(false)}
+            >
+              {editableValues.title}
+              {showDelete && (
+              <span style={{ position: 'absolute' }}>
+                <Button variant="outlined" color="error">Delete</Button>
+              </span>
+              )}
+            </h2>
+            <Modal
+              open={showDeleteModal}
+              onClose={() => setShowDeleteModal(false)}
+              aria-labelledby="parent-modal-title"
+              aria-describedby="parent-modal-description"
+            >
+              <Box>
+                Modal content
+              </Box>
+            </Modal>
+            <hr />
+
+            <h5>Description</h5>
+            <p>{editableValues.description}</p>
+            <hr />
+
+            <h5>Rating</h5>
+
+            <StyledRating
+              name="customized-color"
+              defaultValue={rating}
+              value={rating}
+              onChange={onRatingChange}
+              disabled={isRatingDisabled}
+              precision={1}
+              icon={<FavoriteIcon fontSize="inherit" />}
+              emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+            />
+            <hr />
+            <React.Fragment key="left-drawer">
+              <Button onClick={() => toggleDrawer(true)}>See Comments</Button>
+              <Drawer
+                anchor="right"
+                open={commentsDrawerOpened}
+                onClose={() => toggleDrawer(false)}
+              >
+                <Box
+                  sx={{ width: 750 }}
+                  role="presentation"
+                >
+                  <MovieComments
+                    comments={editableValues.comments}
+                    onCommentSubmit={(value) => onCommentSubmit(value)}
+                  />
+                </Box>
+              </Drawer>
+            </React.Fragment>
+            <hr />
+
+            <ButtonGroup
+              disableElevation
+              variant="contained"
+              aria-label="Disabled elevation buttons"
+            >
+              <Button onClick={() => setIsEditing(true)}>Edit</Button>
+              <Button onClick={() => navigate('/movies')}>Back</Button>
+            </ButtonGroup>
+
+            <hr />
+            <Card style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <CardHeader>
+                <h5>
+                  Trailer:
+                </h5>
+              </CardHeader>
+              <CardContent>
+                <iframe
+                  title={editableValues.title}
+                  width="420"
+                  height="315"
+                  src={`https://www.youtube.com/embed/${editableValues.youtubeId}`}
+                />
+              </CardContent>
+            </Card>
+          </>
+          )}
+          {editableValues && !isLoading && isEditing && (
+            <Box flex alignItems="center" justifyContent="center">
+              <Typography sx={{ fontSize: 32 }} color="text.secondary" gutterBottom>
+                Edit
+                {' '}
+                {originalValues.title}
+              </Typography>
+              <form onSubmit={handleSubmit} style={{ width: '500px', margin: 'auto' }}>
+                {Object.keys(editableValues).filter((x) => x !== 'id' && x !== 'rating' && x !== 'comments').map((key) => (
+                  <div key={key}>
+                    {key === 'description' && (
+                    <FormControl fullWidth margin="dense">
+                      <TextareaAutosize
+                        id={`${editableValues.id}`}
                         rows={10}
                         cols={50}
+                        type="text"
+                        label={key}
+                        value={editableValues[key]}
+                        onChange={handleChange}
+                        name={key}
+                      />
+                    </FormControl>
+                    )}
+
+                    {key !== 'description' && (
+                    <FormControl fullWidth margin="dense">
+                      <TextField
+                        label={key}
+                        variant="outlined"
+                        id={`${editableValues.id}`}
                         type="text"
                         value={editableValues[key]}
                         onChange={handleChange}
                         name={key}
                       />
-                      )}
-
-                      {key !== 'description' && (
-                      <MDBInput
-                        id={`${editableValues.id}_${editableValues.description}`}
-                        rows={10}
-                        cols={50}
-                        type="text"
-                        value={editableValues[key]}
-                        onChange={handleChange}
-                        name={key}
-                      />
-                      )}
-                    </div>
-                  ))}
-                  <MDBBtnGroup>
-                    <MDBBtn type="submit">Save</MDBBtn>
-                    <MDBBtn
-                      type="button"
-                      onClick={handleDiscard}
-                    >
-                      Discard
-                    </MDBBtn>
-                  </MDBBtnGroup>
-                </form>
-              </>
-            ) : (
-              <>
-                <MDBCardImage
-                  src={editableValues?.posterUrl}
-                  className="card-img-top card-img-top--fit"
-                  alt="poster"
-                />
-                <br />
-
-                <h5>{editableValues.title}</h5>
-                <hr />
-
-                <h5>Description</h5>
-                <p>{editableValues.description}</p>
-                <hr />
-
-                <h5>Rating</h5>
-                <Rating
-                  name="half-rating"
-                  value={rating}
-                  onChange={onRatingChange}
-                  disabled={isRatingDisabled}
-                />
-                <hr />
-
-                <MDBBtnGroup>
-                  <MDBBtn onClick={() => setIsEditing(true)}>Edit</MDBBtn>
-                  <MDBBtn onClick={() => navigate('/movies')}>Back</MDBBtn>
-                </MDBBtnGroup>
-                <hr />
-                <MDBCard style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <MDBCardHeader>
-                    <h5>
-                      Trailer:
-                    </h5>
-                  </MDBCardHeader>
-                  <MDBCardBody>
-                    <iframe
-                      title={editableValues.title}
-                      width="420"
-                      height="315"
-                      src={`https://www.youtube.com/embed/${editableValues.youtubeId}`}
-                    />
-                  </MDBCardBody>
-                </MDBCard>
-
-                <React.Fragment key="left-drawer">
-                  <Button onClick={() => toggleDrawer(true)}>See Comments</Button>
-                  <Drawer
-                    anchor="right"
-                    open={commentsDrawerOpened}
-                    onClose={() => toggleDrawer(false)}
-                  >
-                    <Box
-                      sx={{ width: 750 }}
-                      role="presentation"
-                    >
-                      comments
-                      <Divider />
-                      comment now
-                    </Box>
-                  </Drawer>
-                </React.Fragment>
-              </>
-            )}
-          </MDBCard>
-        </MDBCol>
-      ) : (
-        <div>Loading...</div>
-      )}
-    </MDBRow>
+                    </FormControl>
+                    )}
+                  </div>
+                ))}
+                <ButtonGroup
+                  disableElevation
+                  variant="contained"
+                  aria-label="Disabled elevation buttons"
+                >
+                  <Button type="submit">Save</Button>
+                  <Button type="button" onClick={handleDiscard}>Discard</Button>
+                </ButtonGroup>
+              </form>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 
