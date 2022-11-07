@@ -23,7 +23,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Typography from '@mui/material/Typography';
 import apiMovies from '@Api/movies';
 import MovieComments from '@Components/MovieComments/MovieComments';
-import { SafetyDivider } from '@mui/icons-material';
+import Container from '@mui/material/Container';
 
 function MoviePage() {
   const navigate = useNavigate();
@@ -134,14 +134,13 @@ function MoviePage() {
 
   const onMovieDelete = (movieId) => {
     apiMovies.deleteMovie(movieId)
-      .finally((res) => {
-        console.log(res);
+      .finally(() => {
         navigate('/movies');
       })
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Container maxWidth="md">
       <Card variant="outlined">
         <CardContent>
           {isLoading && (
@@ -324,7 +323,7 @@ function MoviePage() {
           )}
         </CardContent>
       </Card>
-    </Box>
+    </Container>
   );
 }
 

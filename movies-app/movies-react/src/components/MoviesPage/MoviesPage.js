@@ -48,19 +48,19 @@ function MoviesPage() {
       <TextField id="standard-basic" value={search} onChange={handleSearch} label="Search for a movie" variant="standard" />
 
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} margin="0 auto">
-        <Item>
-          {isLoading
-            ? (
+        {isLoading
+          ? (
+            <Grid>
               <div>Loading</div>
-            )
-            : correspondingMovies.map((movie) => (
-              <Grid xs={6} key={movie.id}>
-                <Item>
-                  <Movie {...movie} />
-                </Item>
-              </Grid>
-            ))}
-        </Item>
+            </Grid>
+          )
+          : correspondingMovies.map((movie) => (
+            <Grid key={movie.id}>
+              <Item>
+                <Movie {...movie} />
+              </Item>
+            </Grid>
+          ))}
       </Grid>
     </Container>
   );

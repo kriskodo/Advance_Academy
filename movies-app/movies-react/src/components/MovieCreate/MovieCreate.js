@@ -4,7 +4,7 @@ import MuiForm from '@Components/MuiForm/MuiForm';
 import apiMovies from '@Api/movies';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
-import { Card, CardContent, CardHeader } from '@mui/material';
+import { Card, CardContent } from '@mui/material';
 
 function FormCreateMovie() {
   const navigate = useNavigate();
@@ -49,7 +49,8 @@ function FormCreateMovie() {
       minHeight="100vh"
     >
       <Card>
-        <CardHeader>Create a new movie</CardHeader>
+        <h2>Create a new movie</h2>
+
         <CardContent>
           <MuiForm {...formConfig} />
         </CardContent>

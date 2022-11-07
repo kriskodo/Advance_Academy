@@ -15,7 +15,6 @@ function MuiForm({ initialValues, validationSchema, onSubmit }) {
       <form onSubmit={formik.handleSubmit}>
         {Object.keys(initialValues).map((name) => (
           <TextField
-            fullWidth
             id={name}
             key={name}
             name={name}
@@ -24,6 +23,8 @@ function MuiForm({ initialValues, validationSchema, onSubmit }) {
             onChange={formik.handleChange}
             error={formik.touched[name] && Boolean(formik.errors[name])}
             helperText={formik.touched[name] && formik.errors[name]}
+            fullWidth
+            margin="dense"
           />
         ))}
         <Button color="primary" variant="contained" fullWidth type="submit">
