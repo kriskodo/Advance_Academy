@@ -23,6 +23,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Typography from '@mui/material/Typography';
 import apiMovies from '@Api/movies';
 import MovieComments from '@Components/MovieComments/MovieComments';
+import { SafetyDivider } from '@mui/icons-material';
 
 function MoviePage() {
   const navigate = useNavigate();
@@ -141,7 +142,7 @@ function MoviePage() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" ima>
+      <Card variant="outlined">
         <CardContent>
           {isLoading && (
             <div>Loading...</div>
@@ -160,8 +161,6 @@ function MoviePage() {
                 alt="card-image"
               />
             </Box>
-
-            <br />
 
             <h2
               onMouseEnter={() => setShowDelete(true)}

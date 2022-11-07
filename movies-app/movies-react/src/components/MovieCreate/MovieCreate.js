@@ -1,67 +1,61 @@
 import React from 'react';
-import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
-import Button from '@mui/material/Button';
-import { LinearProgress } from '@mui/material';
+import * as yup from 'yup';
+import MuiForm from '@Components/MuiForm/MuiForm';
+import apiMovies from '@Api/movies';
+import { useNavigate } from 'react-router';
+import Box from '@mui/material/Box';
+import { Card, CardContent, CardHeader } from '@mui/material';
 
-function MovieCreate() {
+function FormCreateMovie() {
+  const navigate = useNavigate();
+
+  const formConfig = {
+    initialValues: {
+      Title: '',
+      Description: '',
+      'Poster Url': '',
+      'Youtube Url': '',
+    },
+    validationSchema: yup.object({
+      Title: yup
+        .string('Enter a title')
+        .required('Title is required'),
+      Description: yup
+        .string('Enter a description')
+        .min(10, 'Description should be of minimum 10 characters length')
+        .required('Description is required'),
+      'Poster Url': yup
+        .string('Enter a Poster Url')
+        .url('Enter a valid url')
+        .required('Poster Url is required'),
+      'Youtube Url': yup
+        .string('Enter a Youtube Url')
+        .url('Enter a valid url')
+        .required('Youtube Url is required'),
+    }),
+    onSubmit: (values) => {
+      apiMovies.createMovie(values.Title, values.Description, values['Poster Url'], values['Youtube Url'])
+        .then(() => {
+          navigate('/movies');
+        })
+        .catch((err) => console.log(err));
+    },
+  }
   return (
-    <div>
-      <h2>Create a movie</h2>
-
-      <Formik
-        initialValues={{
-          title: '',
-          description: '',
-          posterUrl: '',
-        }}
-        validate={(values) => {
-          const errors = {};
-          Object.keys(values).forEach((value) => {
-            if (!values[value]) {
-              errors[value] = `Field ${value} cannot be empty.`
-            }
-          })
-          return errors;
-        }}
-        onSubmit={(values, { setSubmitting }) => {
-          setSubmitting(false);
-          console.log(values);
-          alert(JSON.stringify(values, null, 2));
-        }}
-      >
-        {({
-          submitForm, isSubmitting,
-        }) => (
-          <Form>
-            <Field
-              component={TextField}
-              name="title"
-              type="text"
-              label="Title"
-            />
-            <br />
-            <Field
-              component={TextField}
-              name="description"
-              type="text"
-              label="Description"
-            />
-            {isSubmitting && <LinearProgress />}
-            <br />
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={isSubmitting}
-              onClick={submitForm}
-            >
-              Submit
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </div>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+    >
+      <Card>
+        <CardHeader>Create a new movie</CardHeader>
+        <CardContent>
+          <MuiForm {...formConfig} />
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 
-export default MovieCreate;
+export default FormCreateMovie;

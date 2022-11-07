@@ -3,10 +3,11 @@ import makeRequest from './makeRequest';
 const apiMovies = {
   getAll: () => makeRequest('/api/v1/movies', 'GET'),
   getById: (movieId) => makeRequest(`/api/v1/movies/${movieId}`, 'GET'),
-  createMovie: (title, description, posterUrl) => makeRequest('/api/v1/movies', 'POST', {
+  createMovie: (title, description, posterUrl, youtubeId) => makeRequest('/api/v1/movies', 'POST', {
     title,
     description,
     posterUrl,
+    youtubeId,
   }),
   editMovie: (movieId, title, description, posterUrl, youtubeId) => makeRequest(`/api/v1/movies/${movieId}`, 'PUT', {
     title,
