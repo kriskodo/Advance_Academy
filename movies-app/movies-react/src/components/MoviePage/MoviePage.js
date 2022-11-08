@@ -64,17 +64,16 @@ function MoviePage() {
     setEditableValues({ ...originalValues });
   }, [originalValues])
 
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
+  const handleEditSubmit = (data) => {
     const {
       title, description, posterUrl, youtubeId,
-    } = editableValues;
+    } = data;
     setIsLoading(true);
 
     apiMovies.editMovie(id, typeof title === 'object' ? title[0] : title, description, posterUrl, youtubeId)
       .then(() => {
         setIsEditing(false);
-        setOriginalValues(() => ({ ...editableValues }))
+        setOriginalValues(() => ({ ...data }))
       })
       .catch((err) => {
         console.log(err);
@@ -277,7 +276,10 @@ function MoviePage() {
               <MuiForm
                 initialValues={Object.keys(editableValues)
                   .filter((x) => x !== 'id' && x !== 'rating' && x !== 'comments')
-                  .map((x) => editableValues[x])}
+                  .reduce((acc, val) => {
+                    acc[val] = editableValues[val];
+                    return acc;
+                  }, {})}
                 onSubmit={handleEditSubmit}
                 actionButtons={(
                   <ButtonGroup

@@ -15,6 +15,12 @@ function MuiForm({
     onSubmit,
   })
 
+  const adaptInputTitle = (camelCaseTitle) => {
+    const parts = camelCaseTitle.split(/(?=[A-Z])/).join(' ');
+
+    return `${parts[0].toUpperCase()}${parts.slice(1)}`;
+  }
+
   return (
     <div style={style}>
       <form onSubmit={formik.handleSubmit}>
@@ -23,7 +29,7 @@ function MuiForm({
             id={name}
             key={name}
             name={name}
-            label={name}
+            label={adaptInputTitle(name)}
             value={formik.values[name]}
             onChange={formik.handleChange}
             error={formik.touched[name] && Boolean(formik.errors[name])}
