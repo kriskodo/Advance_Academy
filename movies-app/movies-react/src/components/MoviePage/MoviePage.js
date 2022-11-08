@@ -10,12 +10,9 @@ import {
   CardHeader,
   CardMedia,
   Dialog,
-  DialogTitle,
+  DialogTitle, Divider,
   Drawer,
-  FormControl,
   Rating,
-  TextareaAutosize,
-  TextField,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -24,6 +21,8 @@ import Typography from '@mui/material/Typography';
 import apiMovies from '@Api/movies';
 import MovieComments from '@Components/MovieComments/MovieComments';
 import Container from '@mui/material/Container';
+import MuiForm from '@Components/Forms/MuiForm/MuiForm';
+import ProgressLoading from '@Components/ProgressLoading/ProgressLoading';
 
 function MoviePage() {
   const navigate = useNavigate();
@@ -61,13 +60,9 @@ function MoviePage() {
     };
   }, [id, navigate]);
 
-  const handleChange = (e) => {
-    setEditableValues((prev) => (
-      {
-        ...prev,
-        [e.target.name]: [e.target.value],
-      }));
-  };
+  useEffect(() => {
+    setEditableValues({ ...originalValues });
+  }, [originalValues])
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
@@ -105,7 +100,7 @@ function MoviePage() {
   const onCommentSubmit = (value) => {
     apiMovies.commentMovie(id, 'Static Username', value)
       .then((newComment) => {
-        setEditableValues((prevValues) => {
+        setOriginalValues((prevValues) => {
           const copy = { ...prevValues };
           copy.comments = [...copy.comments, newComment];
           return copy;
@@ -139,186 +134,163 @@ function MoviePage() {
       })
   }
 
+  const isDataLoaded = editableValues && !isLoading;
+
   return (
     <Container maxWidth="md">
       <Card variant="outlined">
         <CardContent>
           {isLoading && (
-            <div>Loading...</div>
+            <ProgressLoading />
           )}
-          {editableValues && !isLoading && !isEditing && (
+          {isDataLoaded && !isEditing && (
           <>
-            <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <CardMedia
-                component="img"
-                image={posterUrl ?? ''}
-                style={{
-                  maxHeight: '200px',
-                  maxWidth: '200px',
-                  objectFit: 'contain',
-                }}
-                alt="card-image"
-              />
-            </Box>
-
-            <h2
-              onMouseEnter={() => setShowDelete(true)}
-              onMouseLeave={() => setShowDelete(false)}
-            >
-              {title}
-              {showDelete && (
-              <span style={{ position: 'absolute' }}>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => setShowDeleteModal(true)}
-                >
-                  Delete
-                </Button>
-              </span>
-              )}
-            </h2>
-
-            <Dialog
-              open={showDeleteModal}
-              onClose={() => setShowDeleteModal(false)}
-              aria-labelledby="parent-modal-title"
-              aria-describedby="parent-modal-description"
-            >
-              <Box flex alignItems="center" justifyContent="center">
-                <DialogTitle>
-                  Are you sure you want to delete
-                  {' '}
-                  {title}
-                  ?
-                </DialogTitle>
-
-                <ButtonGroup
-                  disableElevation
-                  variant="contained"
-                  aria-label="Disabled elevation buttons"
-                  fullWidth
-                >
-                  <Button onClick={() => onMovieDelete(id)}>Delete</Button>
-                  <Button color="error" onClick={() => setShowDeleteModal(false)}>Back</Button>
-                </ButtonGroup>
-              </Box>
-            </Dialog>
-            <hr />
-
-            <h5>Description</h5>
-            <p>{description}</p>
-            <hr />
-
-            <h5>Rating</h5>
-
-            <StyledRating
-              name="customized-color"
-              defaultValue={movieRating}
-              value={rating}
-              onChange={onRatingChange}
-              disabled={isRatingDisabled}
-              precision={1}
-              icon={<FavoriteIcon fontSize="inherit" />}
-              emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+            <CardMedia
+              component="img"
+              image={posterUrl ?? ''}
+              style={{
+                maxHeight: '350px',
+                objectFit: 'scale-down',
+              }}
+              alt="card-image"
             />
-            <hr />
-            <React.Fragment key="left-drawer">
-              <Button onClick={() => setCommentsDrawerOpened(true)}>See Comments</Button>
-              <Drawer
-                anchor="right"
-                open={commentsDrawerOpened}
-                onClose={() => setCommentsDrawerOpened(false)}
+            <CardContent>
+              <Divider>Title</Divider>
+              <h2
+                onMouseEnter={() => setShowDelete(true)}
+                onMouseLeave={() => setShowDelete(false)}
+                style={{ margin: '20px' }}
               >
-                <Box
-                  sx={{ width: 750 }}
-                  role="presentation"
-                >
-                  <MovieComments
-                    comments={comments}
-                    onCommentSubmit={(value) => onCommentSubmit(value)}
-                  />
+                {title}
+                {showDelete && (
+                <span style={{ position: 'absolute' }}>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => setShowDeleteModal(true)}
+                  >
+                    Delete
+                  </Button>
+                </span>
+                )}
+              </h2>
+
+              <Dialog
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                aria-labelledby="parent-modal-title"
+                aria-describedby="parent-modal-description"
+              >
+                <Box flex alignItems="center" justifyContent="center">
+                  <DialogTitle>
+                    Are you sure you want to delete
+                    {' '}
+                    {title}
+                    ?
+                  </DialogTitle>
+
+                  <ButtonGroup
+                    disableElevation
+                    variant="contained"
+                    aria-label="Disabled elevation buttons"
+                    fullWidth
+                  >
+                    <Button onClick={() => onMovieDelete(id)}>Delete</Button>
+                    <Button color="error" onClick={() => setShowDeleteModal(false)}>Back</Button>
+                  </ButtonGroup>
                 </Box>
-              </Drawer>
-            </React.Fragment>
-            <hr />
+              </Dialog>
 
-            <ButtonGroup
-              disableElevation
-              variant="contained"
-              aria-label="Disabled elevation buttons"
-            >
-              <Button onClick={() => setIsEditing(true)}>Edit</Button>
-              <Button onClick={() => navigate('/movies')}>Back</Button>
-            </ButtonGroup>
+              <Divider>Description</Divider>
+              <p style={{ margin: '10px' }}>{description}</p>
 
-            <hr />
-            <Card style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <CardHeader>
-                <h5>
-                  Trailer:
-                </h5>
-              </CardHeader>
-              <CardContent>
-                <iframe
-                  title={title}
-                  width="420"
-                  height="315"
-                  src={`https://www.youtube.com/embed/${youtubeId}`}
-                />
-              </CardContent>
-            </Card>
+              <Divider>Rating</Divider>
+              <StyledRating
+                style={{ margin: '10px' }}
+                name="customized-color"
+                defaultValue={movieRating}
+                value={rating}
+                onChange={onRatingChange}
+                disabled={isRatingDisabled}
+                precision={1}
+                icon={<FavoriteIcon fontSize="inherit" />}
+                emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+              />
+
+              <Divider>Comments</Divider>
+              <React.Fragment key="left-drawer">
+                <Button onClick={() => setCommentsDrawerOpened(true)}>See Comments</Button>
+                <Drawer
+                  anchor="right"
+                  open={commentsDrawerOpened}
+                  onClose={() => setCommentsDrawerOpened(false)}
+                >
+                  <Box
+                    sx={{ width: 750 }}
+                    margin={{ margin: '10px' }}
+                    role="presentation"
+                  >
+                    <MovieComments
+                      comments={comments}
+                      onCommentSubmit={(value) => onCommentSubmit(value)}
+                    />
+                  </Box>
+                </Drawer>
+              </React.Fragment>
+
+              <Divider />
+              <ButtonGroup
+                disableElevation
+                variant="contained"
+                aria-label="Disabled elevation buttons"
+              >
+                <Button onClick={() => setIsEditing(true)}>Edit</Button>
+                <Button onClick={() => navigate('/movies')}>Back</Button>
+              </ButtonGroup>
+
+              <Divider>Trailer</Divider>
+              <Card style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CardHeader>
+                  <h5>
+                    Trailer:
+                  </h5>
+                </CardHeader>
+                <CardContent>
+                  <iframe
+                    title={title}
+                    width="420"
+                    height="315"
+                    src={`https://www.youtube.com/embed/${youtubeId}`}
+                  />
+                </CardContent>
+              </Card>
+            </CardContent>
           </>
           )}
-          {editableValues && !isLoading && isEditing && (
+          {isDataLoaded && isEditing && (
             <Box flex alignItems="center" justifyContent="center">
               <Typography sx={{ fontSize: 32 }} color="text.secondary" gutterBottom>
                 Edit
                 {' '}
                 {originalValues.title}
               </Typography>
-              <form onSubmit={handleEditSubmit} style={{ width: '500px', margin: 'auto' }}>
-                {Object.keys(editableValues).filter((x) => x !== 'id' && x !== 'rating' && x !== 'comments').map((key) => (
-                  <div key={key}>
-                    {key === 'description' && (
-                    <FormControl fullWidth margin="dense">
-                      <TextareaAutosize
-                        id={`${id}`}
-                        rows={10}
-                        cols={50}
-                        type="text"
-                        label={key}
-                        value={editableValues[key]}
-                        onChange={handleChange}
-                        name={key}
-                      />
-                    </FormControl>
-                    )}
-
-                    {key !== 'description' && (
-                    <FormControl fullWidth margin="dense">
-                      <TextField
-                        label={key}
-                        variant="outlined"
-                        id={`${editableValues.id}`}
-                        type="text"
-                        value={editableValues[key]}
-                        onChange={handleChange}
-                        name={key}
-                      />
-                    </FormControl>
-                    )}
-                  </div>
-                ))}
-                <ButtonGroup
-                  disableElevation
-                  variant="contained"
-                  aria-label="Disabled elevation buttons"
-                >
-                  <Button type="submit">Save</Button>
-                  <Button type="button" onClick={handleDiscard}>Discard</Button>
-                </ButtonGroup>
-              </form>
+              <MuiForm
+                initialValues={Object.keys(editableValues)
+                  .filter((x) => x !== 'id' && x !== 'rating' && x !== 'comments')
+                  .map((x) => editableValues[x])}
+                onSubmit={handleEditSubmit}
+                actionButtons={(
+                  <ButtonGroup
+                    disableElevation
+                    variant="contained"
+                    aria-label="Disabled elevation buttons"
+                  >
+                    <Button type="submit">Save</Button>
+                    <Button type="button" onClick={handleDiscard}>Discard</Button>
+                  </ButtonGroup>
+                )}
+                style={{ width: '500px', margin: 'auto' }}
+              />
             </Box>
           )}
         </CardContent>

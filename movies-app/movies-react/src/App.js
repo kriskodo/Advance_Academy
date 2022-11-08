@@ -4,7 +4,8 @@ import Movies from '@Components/MoviesPage/MoviesPage';
 import Navigation from '@Components/Navigation/Navigation';
 import Home from '@Components/Home/Home';
 import MoviePage from '@Components/MoviePage/MoviePage';
-import MovieCreate from '@Components/MovieCreate/MovieCreate';
+import MovieCreate from '@Components/CreateMoviePage/CreateMoviePage';
+import NotFound from '@Components/NotFound';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Route exact path="/movies" element={<Movies />} />
         <Route exact path="/movies/:id" element={<MoviePage />} />
         <Route exact path="/movies/create" element={<MovieCreate />} />
-        <Route path="*" element={<p>Error 404 Not found.</p>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

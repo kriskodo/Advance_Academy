@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Movie from '@Components/Movie/Movie';
 import apiMovies from '@Api/movies';
+import ProgressLoading from '@Components/ProgressLoading/ProgressLoading';
 
 function MoviesPage() {
   const [movies, setMovies] = useState([]);
@@ -30,10 +31,11 @@ function MoviesPage() {
     setSearch(e.target.value);
   }
 
-  const correspondingMovies = movies
+  const moviesByRating = movies
     .filter((x) => x.title
       .toLowerCase()
-      .includes(search));
+      .includes(search))
+    .sort((a, b) => b.rating - a.rating);
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -47,14 +49,12 @@ function MoviesPage() {
     <Container maxWidth="md">
       <TextField id="standard-basic" value={search} onChange={handleSearch} label="Search for a movie" variant="standard" />
 
-      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} margin="0 auto">
+      <Grid container spacing={2} margin="0 auto">
         {isLoading
           ? (
-            <Grid>
-              <div>Loading</div>
-            </Grid>
+            <ProgressLoading />
           )
-          : correspondingMovies.map((movie) => (
+          : moviesByRating.map((movie) => (
             <Grid key={movie.id}>
               <Item>
                 <Movie {...movie} />

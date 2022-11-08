@@ -14,8 +14,10 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import './Navigation.css';
+import { useNavigate } from 'react-router'
 
 function Navigation() {
+  const navigate = useNavigate();
   const pages = [{ Home: '/' }, { Movies: '/movies' }, { 'Create a Movie': '/movies/create' }];
   const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -126,15 +128,10 @@ function Navigation() {
                 return (
                   <Button
                     key={label}
-                    onClick={handleCloseNavMenu}
+                    onClick={() => navigate(link)}
                     sx={{ my: 2, color: 'white', display: 'block' }}
                   >
-                    <Link
-                      to={link}
-                      style={{ color: '#fff' }}
-                    >
-                      {label}
-                    </Link>
+                    {label}
                   </Button>
                 )
               })}

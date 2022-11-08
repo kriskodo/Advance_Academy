@@ -1,9 +1,14 @@
 import { useFormik } from 'formik';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import React from 'react';
 
-function MuiForm({ initialValues, validationSchema, onSubmit }) {
+function MuiForm({
+  initialValues,
+  validationSchema,
+  onSubmit,
+  actionButtons,
+  style,
+}) {
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -11,7 +16,7 @@ function MuiForm({ initialValues, validationSchema, onSubmit }) {
   })
 
   return (
-    <div>
+    <div style={style}>
       <form onSubmit={formik.handleSubmit}>
         {Object.keys(initialValues).map((name) => (
           <TextField
@@ -27,9 +32,7 @@ function MuiForm({ initialValues, validationSchema, onSubmit }) {
             margin="dense"
           />
         ))}
-        <Button color="primary" variant="contained" fullWidth type="submit">
-          Submit
-        </Button>
+        {actionButtons}
       </form>
     </div>
   )

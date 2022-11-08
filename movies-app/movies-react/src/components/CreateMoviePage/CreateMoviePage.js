@@ -1,12 +1,13 @@
 import React from 'react';
 import * as yup from 'yup';
-import MuiForm from '@Components/MuiForm/MuiForm';
+import MuiForm from '@Components/Forms/MuiForm/MuiForm';
 import apiMovies from '@Api/movies';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import { Card, CardContent } from '@mui/material';
+import Button from '@mui/material/Button';
 
-function FormCreateMovie() {
+function CreateMoviePage() {
   const navigate = useNavigate();
 
   const formConfig = {
@@ -40,6 +41,9 @@ function FormCreateMovie() {
         })
         .catch((err) => console.log(err));
     },
+    actionButtons: (
+      <Button type="submit" variant="outlined">Submit</Button>
+    ),
   }
   return (
     <Box
@@ -59,4 +63,4 @@ function FormCreateMovie() {
   );
 }
 
-export default FormCreateMovie;
+export default CreateMoviePage;
