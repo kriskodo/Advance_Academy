@@ -1,6 +1,6 @@
 import React from 'react';
 import * as yup from 'yup';
-import MuiForm from '@Components/Forms/MuiForm/MuiForm';
+import MuiForm from '@Modules/common/components/MuiForm/MuiForm';
 import apiMovies from '@Api/movies';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';

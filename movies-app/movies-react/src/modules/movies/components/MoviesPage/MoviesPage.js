@@ -3,9 +3,9 @@ import TextField from '@mui/material/TextField';
 import { Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import Movie from '@Components/Movie/Movie';
+import Movie from '@Src/modules/movies/components/Movie/Movie';
 import apiMovies from '@Api/movies';
-import ProgressLoading from '@Components/ProgressLoading/ProgressLoading';
+import ProgressLoading from '@Modules/common/components/ProgressLoading/ProgressLoading';
 
 function MoviesPage() {
   const [movies, setMovies] = useState([]);
