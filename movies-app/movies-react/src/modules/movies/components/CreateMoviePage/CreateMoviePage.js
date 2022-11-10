@@ -50,7 +50,7 @@ function CreateMoviePage() {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      minHeight="100vh"
+      minHeight="90vh"
     >
       <Card>
         <h2>Create a new movie</h2>

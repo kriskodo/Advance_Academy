@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import { Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import Movie from '@Src/modules/movies/components/Movie/Movie';
+import Movie from '@Modules/movies/components/Movie/Movie';
 import apiMovies from '@Api/movies';
 import ProgressLoading from '@Modules/common/components/ProgressLoading/ProgressLoading';
 
@@ -49,7 +49,12 @@ function MoviesPage() {
     <Container maxWidth="md">
       <TextField id="standard-basic" value={search} onChange={handleSearch} label="Search for a movie" variant="standard" />
 
-      <Grid container spacing={2} margin="0 auto">
+      <Grid
+        container
+        sx={{
+          margin: '0 auto', display: 'flex', justifyContent: 'center', alignItems: 'center',
+        }}
+      >
         {isLoading
           ? (
             <ProgressLoading />

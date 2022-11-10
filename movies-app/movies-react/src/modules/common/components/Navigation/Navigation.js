@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -97,7 +96,13 @@ function Navigation() {
 
                   return (
                     <MenuItem key={label} onClick={handleCloseNavMenu}>
-                      <Link to={link}>{label}</Link>
+                      <Button
+                        key={label}
+                        onClick={() => navigate(link)}
+                        sx={{ my: 2, color: 'primary', display: 'block' }}
+                      >
+                        {label}
+                      </Button>
                     </MenuItem>
                   )
                 })}
